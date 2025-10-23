@@ -33,9 +33,24 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# prisma
+prisma/*.db
+prisma/*.db-journal
+prisma/*.db.backup
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
+
+# test files (optional - uncomment if you don't want to commit tests)
+# test-*.js
+# api-examples.js
+# manage-users.js
+
+# claude chat history
+.claude/

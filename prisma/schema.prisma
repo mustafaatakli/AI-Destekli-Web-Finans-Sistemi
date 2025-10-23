@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"  // Changed from sqlite to postgresql for production
+  url      = env("DATABASE_URL")
+}
+
+model Subscriber {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  categories    String   // comma-separated: doviz,altin,borsa
+  notificationHour Int    // 0-23
+  notificationFrequency String // daily, twice, three_times
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastSentAt    DateTime?
+
+  @@index([email])
+  @@index([isActive])
+}
+
+model NewsCache {
+  id          String   @id @default(uuid())
+  category    String   // doviz, altin, borsa
+  newsTitle   String
+  newsUrl     String
+  summary     String   @default("")
+  createdAt   DateTime @default(now())
+
+  @@index([category])
+  @@index([createdAt])
+}
+
+model MarketData {
+  id          String   @id @default(uuid())
+  dataType    String   // currency, gold, stock
+  data        String   // JSON stringified data
+  source      String   // which scraper source was used
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([dataType])
+  @@index([updatedAt])
+}
+
+model OTP {
+  id          String   @id @default(uuid())
+  email       String
+  code        String   // 6-digit OTP code
+  attempts    Int      @default(0)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
+}
