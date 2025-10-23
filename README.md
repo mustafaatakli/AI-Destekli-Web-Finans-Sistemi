@@ -548,12 +548,6 @@ Katkılarınızı bekliyoruz!
 
 ---
 
-## 📝 License
-
-Bu proje [MIT License](LICENSE) altında lisanslanmıştır.
-
----
-
 ## 🙏 Teşekkürler
 
 Bu proje şu açık kaynak projelerini kullanmaktadır:
@@ -568,17 +562,6 @@ Bu proje şu açık kaynak projelerini kullanmaktadır:
 
 ---
 
-## 📞 Destek
-
-Sorularınız veya sorunlarınız için:
-
-- 🐛 **Bug Report:** [GitHub Issues](https://github.com/KULLANICI_ADI/finalert/issues)
-- 💬 **Genel Sorular:** [GitHub Discussions](https://github.com/KULLANICI_ADI/finalert/discussions)
-- 📧 **E-posta:** support@finalert.com
-- 💬 **Telegram:** [@MyFinAlertBot](https://t.me/MyFinAlertBot)
-
----
-
 ## 🗺️ Roadmap
 
 ### v1.0 (Mevcut)
@@ -588,13 +571,6 @@ Sorularınız veya sorunlarınız için:
 - ✅ Telegram bot entegrasyonu
 - ✅ OTP ile güvenli tercih yönetimi
 - ✅ Admin panel
-
-### v1.1 (Planlanıyor)
-- 🔄 Kripto para desteği (Bitcoin, Ethereum)
-- 🔄 Mobil uygulama (React Native)
-- 🔄 Push notifications (Web & Mobile)
-- 🔄 Çok dilli destek (EN, TR, DE)
-- 🔄 Dashboard (kullanıcı paneli)
 
 ### v2.0 (Gelecek)
 - 🔮 Portfolio takibi
@@ -613,7 +589,7 @@ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın! ⭐
 
 <div align="center">
 
-**Made with ❤️ in Türkiye**
+**Made with in Türkiye**
 
 [Website](https://finalert.vercel.app) • [Telegram Bot](https://t.me/MyFinAlertBot) • [Documentation](https://github.com/KULLANICI_ADI/finalert/wiki)
 
