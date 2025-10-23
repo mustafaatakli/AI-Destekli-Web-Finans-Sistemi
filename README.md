@@ -593,3 +593,23 @@ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın! ⭐
 [Website](https://finalert.vercel.app) • [Telegram Bot](https://t.me/MyFinAlertBot) • [Documentation](https://github.com/KULLANICI_ADI/finalert/wiki)
 
 </div>
+
+## 🖼️ Örnek Çalışma Görüntüleri
+
+<img src="https://github.com/mustafaatakli/AI-Destekli-Web-Finans-Sistemi/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-10-24%20002607.png" width="auto">
+
+---
+
+<img src="https://github.com/mustafaatakli/AI-Destekli-Web-Finans-Sistemi/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-10-24%20002703.png" width="auto">
+
+---
+
+<img src="https://github.com/mustafaatakli/AI-Destekli-Web-Finans-Sistemi/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-10-24%20002727.png" width="auto">
+
+---
+
+<img src="https://github.com/mustafaatakli/AI-Destekli-Web-Finans-Sistemi/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-10-24%20002804.png" width="auto">
+
+---
+
+<img src="https://github.com/mustafaatakli/AI-Destekli-Web-Finans-Sistemi/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-10-24%20002823.png" width="auto">
