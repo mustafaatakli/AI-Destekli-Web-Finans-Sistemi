@@ -45,7 +45,6 @@
 
 🌐 **Web Sitesi:** [https://finalert.vercel.app](https://finalertweb.app)   
 🤖 **Telegram Bot:** [@MyFinAlertBot](https://t.me/MyFinAlertBot)  
-👨‍💼 **Admin Panel:** `/admin` (Bearer token gerekli)
 
 ---
 
