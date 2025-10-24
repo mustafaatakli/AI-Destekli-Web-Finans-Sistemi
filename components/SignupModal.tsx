@@ -97,6 +97,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                   {step === 'success' ? 'Tebrikler!' : 'Kayıt Ol'}
                 </h2>
                 <button
+                  type="button"
                   onClick={handleClose}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
@@ -141,6 +142,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                       className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-600 focus:outline-none transition-colors mb-6 text-gray-900 placeholder:text-gray-400"
                     />
                     <button
+                      type="button"
                       onClick={() => {
                         if (email && email.includes('@')) {
                           setStep('categories')
@@ -169,6 +171,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                     <div className="space-y-3 mb-6">
                       {categoryOptions.map((category) => (
                         <button
+                          type="button"
                           key={category.id}
                           onClick={() => handleCategoryToggle(category.id)}
                           className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
@@ -194,12 +197,14 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                     </div>
                     <div className="flex gap-3">
                       <button
+                        type="button"
                         onClick={() => setStep('email')}
                         className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all"
                       >
                         Geri
                       </button>
                       <button
+                        type="button"
                         onClick={() => {
                           if (categories.length > 0) {
                             setStep('schedule')
@@ -234,6 +239,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                       <div className="space-y-2">
                         {frequencyOptions.map((freq) => (
                           <button
+                            type="button"
                             key={freq.id}
                             onClick={() => setFrequency(freq.id)}
                             className={`w-full p-3 rounded-xl border-2 transition-all text-left ${
@@ -268,12 +274,14 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
                     <div className="flex gap-3">
                       <button
+                        type="button"
                         onClick={() => setStep('categories')}
                         className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all"
                       >
                         Geri
                       </button>
                       <button
+                        type="button"
                         onClick={() => setStep('confirm')}
                         className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
                       >
@@ -331,6 +339,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
                     <div className="flex gap-3">
                       <button
+                        type="button"
                         onClick={() => setStep('schedule')}
                         disabled={isLoading}
                         className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all disabled:opacity-50"
@@ -338,6 +347,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                         Geri
                       </button>
                       <button
+                        type="button"
                         onClick={handleSubmit}
                         disabled={isLoading}
                         className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
@@ -372,6 +382,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                       {email} adresinize yakında ilk finans özetinizi göndereceğiz.
                     </p>
                     <button
+                      type="button"
                       onClick={handleClose}
                       className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
                     >
