@@ -5,7 +5,7 @@
 [![Prisma](https://img.shields.io/badge/Prisma-6.17.1-2D3748)](https://www.prisma.io/)
 
 > Günlük finans piyasalarını takip etmek artık çok kolay! Döviz, altın ve borsa verilerini AI destekli özetlerle e-postanızda alın.
-
+> "Geliştirilmiş tip güvenliği, ölçeklenebilirlik ve sürdürülebilirlik için TypeScript ve React kullanılarak geliştirilmiştir.
 ---
 
 ## 🌟 Özellikler
