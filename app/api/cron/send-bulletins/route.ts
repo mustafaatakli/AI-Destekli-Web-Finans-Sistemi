@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
         
         for (const category of categories) {
           const news = await getCachedNews(category)
-          const limitedNews = news.slice(0, 10) // Get top 10 news for better context
+          const limitedNews = news.slice(0, 4) // Get top 10 news for better context
 
           // Summarize all news for this category at once with AI
           let summary = ''
