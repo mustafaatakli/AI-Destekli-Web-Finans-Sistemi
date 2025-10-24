@@ -172,9 +172,9 @@ export default function AdminPanel() {
             </button>
           </form>
           <div className="mt-6 text-center text-sm text-gray-600">
-            <p>Admin anahtarı için .env dosyasındaki</p>
-            <code className="bg-gray-100 px-2 py-1 rounded">ADMIN_SECRET_KEY</code>
-            <p className="mt-2">değerini kullanın</p>
+            <p></p>
+            <code className="bg-gray-100 px-2 py-1 rounded"></code>
+            <p className="mt-2"></p>
           </div>
         </div>
       </div>
