@@ -169,9 +169,9 @@ export async function GET(request: NextRequest) {
 function shouldSendEmailAtHour(subscriber: any, currentHour: number, now: Date): boolean {
   const { notificationHour, notificationFrequency, lastSentAt } = subscriber
 
-  // If never sent before, send immediately (don't wait for specific hour)
+  // If never sent before, send at their chosen hour (welcome bulletin)
   if (!lastSentAt) {
-    return true
+    return currentHour === notificationHour
   }
 
   const lastSent = new Date(lastSentAt)
@@ -179,18 +179,18 @@ function shouldSendEmailAtHour(subscriber: any, currentHour: number, now: Date):
 
   switch (notificationFrequency) {
     case 'daily':
-      // Send once per day at their chosen hour
+      // Send once per day at their chosen hour (minimum 23h between sends)
       return currentHour === notificationHour && hoursSinceLastSent >= 23
 
     case 'twice':
       // Send twice per day: at chosen hour and 12 hours later
-      const isFirstSend = currentHour === notificationHour && hoursSinceLastSent >= 23
+      const isFirstSend = currentHour === notificationHour && hoursSinceLastSent >= 11
       const isSecondSend = currentHour === (notificationHour + 12) % 24 && hoursSinceLastSent >= 11
       return isFirstSend || isSecondSend
 
     case 'three_times':
-      // Send three times per day: at chosen hour, +6h, and +12h
-      const isFirst = currentHour === notificationHour && hoursSinceLastSent >= 23
+      // Send three times per day: at chosen hour, +6h, and +12h (minimum 5h between sends)
+      const isFirst = currentHour === notificationHour && hoursSinceLastSent >= 5
       const isSecond = currentHour === (notificationHour + 6) % 24 && hoursSinceLastSent >= 5
       const isThird = currentHour === (notificationHour + 12) % 24 && hoursSinceLastSent >= 5
       return isFirst || isSecond || isThird
