@@ -113,14 +113,14 @@ export function sanitizeHour(hour: any): number {
  * Only allows predefined values
  */
 export function sanitizeFrequency(frequency: string): string {
-  const allowed = ['once', 'twice', 'daily', 'three_times']
+  const allowed = ['daily', 'twice', 'three_times']
   const clean = frequency.toLowerCase().trim()
-  
+
   if (allowed.includes(clean)) {
     return clean
   }
-  
-  return 'once' // Default
+
+  return 'daily' // Default
 }
 
 /**
