@@ -21,13 +21,13 @@ export default function PreferencesPage() {
   // Form state
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [notificationHour, setNotificationHour] = useState(21)
-  const [notificationFrequency, setNotificationFrequency] = useState<'once' | 'twice'>('once')
+  const [notificationFrequency, setNotificationFrequency] = useState<'daily' | 'twice' | 'three_times'>('daily')
   const [isActive, setIsActive] = useState(true)
 
   const categories = [
+    { value: 'doviz', label: '💵 Döviz', color: 'green' },
     { value: 'altin', label: '💰 Altın', color: 'yellow' },
-    { value: 'dolar', label: '💵 Dolar', color: 'green' },
-    { value: 'euro', label: '💶 Euro', color: 'blue' },
+    { value: 'borsa', label: '📈 Borsa', color: 'blue' },
   ]
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
@@ -451,9 +451,9 @@ export default function PreferencesPage() {
                       <input
                         type="radio"
                         name="frequency"
-                        value="once"
-                        checked={notificationFrequency === 'once'}
-                        onChange={(e) => setNotificationFrequency('once')}
+                        value="daily"
+                        checked={notificationFrequency === 'daily'}
+                        onChange={(e) => setNotificationFrequency('daily')}
                         className="mr-3"
                       />
                       <div>
@@ -473,6 +473,20 @@ export default function PreferencesPage() {
                       <div>
                         <span className="text-white font-semibold">Günde 2 Bülten</span>
                         <p className="text-sm text-gray-400">Sabah 08:00 ve akşam seçtiğiniz saatte</p>
+                      </div>
+                    </label>
+                    <label className="flex items-center p-4 bg-slate-900/50 rounded-lg border-2 border-slate-600 cursor-pointer hover:border-slate-500 transition-colors">
+                      <input
+                        type="radio"
+                        name="frequency"
+                        value="three_times"
+                        checked={notificationFrequency === 'three_times'}
+                        onChange={(e) => setNotificationFrequency('three_times')}
+                        className="mr-3"
+                      />
+                      <div>
+                        <span className="text-white font-semibold">Günde 3 Bülten</span>
+                        <p className="text-sm text-gray-400">Sabah, öğle ve akşam bildirim alın</p>
                       </div>
                     </label>
                   </div>
