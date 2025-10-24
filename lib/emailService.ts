@@ -93,8 +93,8 @@ export function generateNewsEmailTemplate(
                   .map(([type, data]: [string, any]) => `
                     <tr>
                       <td style="padding: 8px 0; font-weight: 600; text-transform: capitalize;">${type}</td>
-                      <td style="padding: 8px 0;">Alış: ${data.alis?.toFixed(2)} TL</td>
-                      <td style="padding: 8px 0;">Satış: ${data.satis?.toFixed(2)} TL</td>
+                      <td style="padding: 8px 0;">Alış: ${data.alis !== null && data.alis !== undefined ? data.alis.toFixed(2) + ' TL' : '-'}</td>
+                      <td style="padding: 8px 0;">Satış: ${data.satis !== null && data.satis !== undefined ? data.satis.toFixed(2) + ' TL' : '-'}</td>
                     </tr>
                   `).join('')}
               </table>
