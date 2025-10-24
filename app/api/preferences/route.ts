@@ -141,7 +141,7 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    if (!['once', 'twice'].includes(notificationFrequency)) {
+    if (!['daily', 'twice', 'three_times'].includes(notificationFrequency)) {
       return NextResponse.json(
         { error: 'Geçersiz bildirim sıklığı' },
         { status: 400 }
