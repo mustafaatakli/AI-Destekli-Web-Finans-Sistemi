@@ -68,49 +68,48 @@ export async function GET(request: NextRequest) {
         // Parse categories
         const categories = subscriber.categories.split(',') as ('doviz' | 'altin' | 'borsa')[]
 
-        // Collect news and summaries for all categories
-        const categorySummaries: Array<{ category: string; summary: string; marketData?: any }> = []
-        
-        for (const category of categories) {
-          const news = await getCachedNews(category)
-          const limitedNews = news.slice(0, 4) // Get top 10 news for better context
+        // Collect news and summaries for all categories IN PARALLEL (3x faster!)
+        const categorySummaries = await Promise.all(
+          categories.map(async (category) => {
+            const news = await getCachedNews(category)
+            const limitedNews = news.slice(0, 5) // Get top 5 news for faster processing
 
-          // Summarize all news for this category at once with AI
-          let summary = ''
-          try {
-            const newsItems = limitedNews.map(item => ({
-              title: item.title,
-              url: item.url,
-              content: item.content || ''
-            }))
-            summary = await summarizeNewsWithAI(newsItems[0]?.title || '', newsItems[0]?.url || '', category)
-            
-            // Actually, let's use the proper multi-news summarization
-            if (limitedNews.length > 0) {
-              const { summarizeNews } = await import('@/lib/gemini')
-              summary = await summarizeNews(newsItems, category)
+            // Summarize all news for this category at once with AI
+            let summary = ''
+            try {
+              if (limitedNews.length > 0) {
+                const newsItems = limitedNews.map(item => ({
+                  title: item.title,
+                  url: item.url,
+                  content: item.content || ''
+                }))
+                const { summarizeNews } = await import('@/lib/gemini')
+                summary = await summarizeNews(newsItems, category)
+              } else {
+                summary = `${category} kategorisinde henüz haber bulunmamaktadır.`
+              }
+            } catch (error) {
+              console.error(`AI summarization failed for ${category}:`, error)
+              summary = 'Haber özeti şu an oluşturulamadı.'
             }
-          } catch (error) {
-            console.error(`AI summarization failed for ${category}:`, error)
-            summary = `${category} kategorisinde ${limitedNews.length} haber bulunmaktadır.`
-          }
 
-          // Get category-specific market data
-          let categoryMarketData = undefined
-          if (category === 'doviz' && marketData.currency?.USD) {
-            categoryMarketData = { currencies: marketData.currency }
-          } else if (category === 'altin' && marketData.gold?.gram) {
-            categoryMarketData = { gold: marketData.gold }
-          } else if (category === 'borsa' && marketData.stock) {
-            categoryMarketData = { stocks: marketData.stock }
-          }
+            // Get category-specific market data
+            let categoryMarketData = undefined
+            if (category === 'doviz' && marketData.currency?.USD) {
+              categoryMarketData = { currencies: marketData.currency }
+            } else if (category === 'altin' && marketData.gold?.gram) {
+              categoryMarketData = { gold: marketData.gold }
+            } else if (category === 'borsa' && marketData.stock) {
+              categoryMarketData = { stocks: marketData.stock }
+            }
 
-          categorySummaries.push({
-            category,
-            summary,
-            marketData: categoryMarketData
+            return {
+              category,
+              summary,
+              marketData: categoryMarketData
+            }
           })
-        }
+        )
 
         // Send email
         const { generateNewsEmailTemplate } = await import('@/lib/emailService')
