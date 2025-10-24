@@ -723,17 +723,17 @@ export async function getFinancialNews(category: 'doviz' | 'altin' | 'borsa'): P
  */
 function matchesCategory(text: string, category: string): boolean {
   const categoryKeywords: Record<string, string[]> = {
-    doviz: ['dolar', 'euro', 'sterlin', 'döviz', 'kur', 'parite', 'usd', 'eur', 'gbp', 'tcmb', 'merkez bankası', 'faiz', 'döviz kuru', 'enflasyon', 'politika faizi'],
-    altin: ['altın', 'gram altın', 'çeyrek altın', 'ons', 'külçe', 'kuyumcu', 'emtia', 'gold', 'precious metal', 'altın fiyat'],
-    borsa: ['borsa', 'bist', 'hisse', 'endeks', 'pay', 'viop', 'tahvil', 'bono', 'imkb', 'piyasa', 'hisse senedi', 'yatırımcı']
+    doviz: ['dolar', 'euro', 'sterlin', 'döviz', 'kur', 'parite', 'usd', 'eur', 'gbp', 'tcmb', 'merkez bankası', 'faiz', 'enflasyon', 'politika faizi', 'döviz kuru', 'kur farkı', 'parite', 'kambiyo'],
+    altin: ['altın', 'gram', 'çeyrek', 'ons', 'külçe', 'kuyumcu', 'emtia', 'gold', 'ounce', 'altın fiyat', 'değerli metal', '귀금속'],
+    borsa: ['borsa', 'bist', 'hisse', 'endeks', 'pay', 'viop', 'tahvil', 'bono', 'imkb', 'piyasa', 'hisse senedi', 'yatırımcı', 'şirket', 'halka arz', 'kar', 'zarar', 'ciro']
   }
 
-  // Alakasız haberleri filtrele (negatif keywords)
+  // SADECE NET ALAKASIZ haberleri filtrele (daha az agresif)
   const excludeKeywords = [
-    'jaguar', 'land rover', 'otomobil', 'araç', 'motor', 'siber saldırı', 'üretim',
-    'nar ihracatı', 'antalya', 'zeytinyağı', 'karaman', 'tarhana', 'sucuk', 'a101', 'aktüel',
-    'katalog', 'indirim', 'kamp', 'çadır', 'koşu bandı', 'puzzle', 'oyuncak', 'tarım',
-    'gıda', 'krem', 'lezzet', 'tarif', 'boya', 'hileli', 'taklit'
+    'jaguar land rover', 'otomobil üretimi', 'araç üretimi',
+    'nar ihracatı', 'zeytinyağı tesisi', 'tarhana ürün', 'sucuk hileli',
+    'a101 aktüel', 'koşu bandı', 'puzzle oyuncak', 'kamp çadır',
+    'gıda hileli', 'gıda boyası', 'yemek tarif'
   ]
 
   const keywords = categoryKeywords[category] || []
