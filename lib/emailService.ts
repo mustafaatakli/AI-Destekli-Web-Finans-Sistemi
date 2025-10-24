@@ -106,6 +106,8 @@ export function generateNewsEmailTemplate(
               <h4 style="margin: 0 0 10px 0; color: #495057;">Borsa Verileri</h4>
               <table style="width: 100%; border-collapse: collapse;">
                 ${Object.entries(marketData.stocks as Record<string, any>)
+                  .filter(([key]) => !key.startsWith('_')) // _kaynak gibi metadata alanlarını filtrele
+                  .slice(0, 10) // Sadece ilk 10 hisse
                   .map(([symbol, data]: [string, any]) => `
                     <tr>
                       <td style="padding: 8px 0; font-weight: 600;">${symbol}</td>
