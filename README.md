@@ -522,6 +522,6 @@ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın! ⭐
 
 **Made with in Türkiye**
 
-[Website](https://finalert.vercel.app) • [Telegram Bot](https://t.me/MyFinAlertBot) • [Documentation](https://github.com/KULLANICI_ADI/finalert/wiki)
+[Website](https://finalertweb.app) • [Telegram Bot](https://t.me/MyFinAlertBot) • [Documentation](https://github.com/mustafaatakli/AI-Destekli-Web-Finans-Sistemi/blob/main/README.md)
 
 </div>
