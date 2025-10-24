@@ -718,20 +718,32 @@ export async function getFinancialNews(category: 'doviz' | 'altin' | 'borsa'): P
 }
 
 /**
- * Kategori için keyword kontrolü yapar (ESNEK)
- * Başlık veya içerikte en az bir keyword varsa true döner
+ * Kategori için keyword kontrolü yapar (GÜÇLENDİRİLMİŞ)
+ * Pozitif keyword içermeli VE negatif keyword içermemeli
  */
 function matchesCategory(text: string, category: string): boolean {
   const categoryKeywords: Record<string, string[]> = {
-    doviz: ['dolar', 'euro', 'sterlin', 'döviz', 'kur', 'parite', 'usd', 'eur', 'gbp', 'tcmb', 'merkez bankası', 'faiz'],
-    altin: ['altın', 'gram altın', 'çeyrek', 'ons', 'külçe', 'gram', 'kuyumcu', 'emtia', 'gold'],
-    borsa: ['borsa', 'bist', 'hisse', 'endeks', 'pay', 'viop', 'tahvil', 'bono', 'imkb', 'piyasa']
+    doviz: ['dolar', 'euro', 'sterlin', 'döviz', 'kur', 'parite', 'usd', 'eur', 'gbp', 'tcmb', 'merkez bankası', 'faiz', 'döviz kuru', 'enflasyon', 'politika faizi'],
+    altin: ['altın', 'gram altın', 'çeyrek altın', 'ons', 'külçe', 'kuyumcu', 'emtia', 'gold', 'precious metal', 'altın fiyat'],
+    borsa: ['borsa', 'bist', 'hisse', 'endeks', 'pay', 'viop', 'tahvil', 'bono', 'imkb', 'piyasa', 'hisse senedi', 'yatırımcı']
   }
+
+  // Alakasız haberleri filtrele (negatif keywords)
+  const excludeKeywords = [
+    'jaguar', 'land rover', 'otomobil', 'araç', 'motor', 'siber saldırı', 'üretim',
+    'nar ihracatı', 'antalya', 'zeytinyağı', 'karaman', 'tarhana', 'sucuk', 'a101', 'aktüel',
+    'katalog', 'indirim', 'kamp', 'çadır', 'koşu bandı', 'puzzle', 'oyuncak', 'tarım',
+    'gıda', 'krem', 'lezzet', 'tarif', 'boya', 'hileli', 'taklit'
+  ]
 
   const keywords = categoryKeywords[category] || []
   const lowerText = text.toLowerCase()
 
-  // En az bir keyword içermeli
+  // Negatif keyword varsa hemen false dön
+  const hasExcluded = excludeKeywords.some(keyword => lowerText.includes(keyword.toLowerCase()))
+  if (hasExcluded) return false
+
+  // En az bir pozitif keyword içermeli
   return keywords.some(keyword => lowerText.includes(keyword.toLowerCase()))
 }
 
