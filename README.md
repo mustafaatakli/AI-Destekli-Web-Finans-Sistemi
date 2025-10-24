@@ -3,7 +3,6 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15.5.6-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-6.17.1-2D3748)](https://www.prisma.io/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 > Günlük finans piyasalarını takip etmek artık çok kolay! Döviz, altın ve borsa verilerini AI destekli özetlerle e-postanızda alın.
 
@@ -71,12 +70,7 @@
 - **SMTP:** Nodemailer (Gmail App Password)
 - **Telegram:** Telegram Bot API
 - **CRON:** Node-Cron (Development) / External Services (Production)
-
-### **Deployment**
-- **Hosting:** Vercel (Serverless)
-- **Database:** Vercel Postgres / Railway / Supabase
-- **CRON Jobs:** Cron-Job.org / Vercel Cron (Pro)
-
+- 
 ---
 
 ## 📦 Kurulum
