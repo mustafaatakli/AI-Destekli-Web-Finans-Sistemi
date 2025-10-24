@@ -797,6 +797,40 @@ async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
         .slice(0, 10)
     }
 
+    // Eğer keyword filtrelemesi hiç haber bulamadıysa, filtresiz dene
+    console.log(`⚠ No filtered news found for ${category}, trying without filter...`)
+    const allNewsUnfiltered: NewsItem[] = []
+    
+    for (const feedUrl of feedUrls) {
+      try {
+        const feed = await rssParser.parseURL(feedUrl)
+        if (feed.items && feed.items.length > 0) {
+          const news = feed.items
+            .slice(0, 5)
+            .map(item => ({
+              title: item.title || 'Başlık yok',
+              url: item.link || '',
+              content: item.contentSnippet || item.content || item.title || '',
+              category: category,
+              publishedAt: item.pubDate ? new Date(item.pubDate) : new Date()
+            }))
+          allNewsUnfiltered.push(...news)
+        }
+      } catch (error) {
+        continue
+      }
+    }
+    
+    if (allNewsUnfiltered.length > 0) {
+      return allNewsUnfiltered
+        .sort((a, b) => {
+          const dateA = a.publishedAt || new Date(0)
+          const dateB = b.publishedAt || new Date(0)
+          return dateB.getTime() - dateA.getTime()
+        })
+        .slice(0, 10)
+    }
+
     return []
   } catch (error) {
     console.error('RSS news fetching failed:', error)
