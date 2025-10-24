@@ -720,6 +720,12 @@ export async function getFinancialNews(category: 'doviz' | 'altin' | 'borsa'): P
 /**
  * RSS Feed kaynaklarından haber çekme (EN GÜVENİLİR YÖNTEM)
  * RSS feed'ler HTML parsing'e göre çok daha stabil ve güvenilirdir
+ * 
+ * NOT: Keyword filtreleme kaldırıldı çünkü:
+ * - RSS feed'lerindeki haberler genellikle genel ekonomi haberleri
+ * - Keyword filtresi çok katı olduğu için hiç haber bulamıyordu
+ * - AI (Gemini) zaten kategori-spesifik özetler üretebiliyor
+ * - Bu yöntem daha esnek ve güvenilir
  */
 async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
   try {
@@ -743,31 +749,17 @@ async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
       ]
     }
 
-    // Kategori anahtar kelimeleri
-    const categoryKeywords: Record<string, string[]> = {
-      doviz: ['döviz', 'dolar', 'euro', 'sterlin', 'yuan', 'kur', 'tl', 'usd', 'eur', 'gbp'],
-      altin: ['altın', 'gümüş', 'gram', 'ons', 'emtia', 'külçe', 'çeyrek'],
-      borsa: ['borsa', 'hisse', 'endeks', 'xu100', 'bist', 'pay', 'yatırım', 'tahvil']
-    }
-
     const feedUrls = rssFeeds[category] || rssFeeds.borsa
     const allNews: NewsItem[] = []
 
-    // Her RSS feed'den haber çek
+    // Her RSS feed'den haber çek (filtresiz - AI'ya güveniyoruz)
     for (const feedUrl of feedUrls) {
       try {
         const feed = await rssParser.parseURL(feedUrl)
 
         if (feed.items && feed.items.length > 0) {
+          // Keyword filtresi KALDIRILDI - doğrudan map ediyoruz
           const news = feed.items
-            .filter(item => {
-              // Kategori filtresi: başlık veya içerik anahtar kelime içermeli
-              const title = (item.title || '').toLowerCase()
-              const content = (item.contentSnippet || item.content || '').toLowerCase()
-              const keywords = categoryKeywords[category] || []
-              
-              return keywords.some(keyword => title.includes(keyword) || content.includes(keyword))
-            })
             .slice(0, 5)
             .map(item => ({
               title: item.title || 'Başlık yok',
@@ -789,40 +781,6 @@ async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
       console.log(`✓ RSS News fetched: ${allNews.length} items for ${category}`)
       // En yeni haberleri döndür, maksimum 10 haber
       return allNews
-        .sort((a, b) => {
-          const dateA = a.publishedAt || new Date(0)
-          const dateB = b.publishedAt || new Date(0)
-          return dateB.getTime() - dateA.getTime()
-        })
-        .slice(0, 10)
-    }
-
-    // Eğer keyword filtrelemesi hiç haber bulamadıysa, filtresiz dene
-    console.log(`⚠ No filtered news found for ${category}, trying without filter...`)
-    const allNewsUnfiltered: NewsItem[] = []
-    
-    for (const feedUrl of feedUrls) {
-      try {
-        const feed = await rssParser.parseURL(feedUrl)
-        if (feed.items && feed.items.length > 0) {
-          const news = feed.items
-            .slice(0, 5)
-            .map(item => ({
-              title: item.title || 'Başlık yok',
-              url: item.link || '',
-              content: item.contentSnippet || item.content || item.title || '',
-              category: category,
-              publishedAt: item.pubDate ? new Date(item.pubDate) : new Date()
-            }))
-          allNewsUnfiltered.push(...news)
-        }
-      } catch (error) {
-        continue
-      }
-    }
-    
-    if (allNewsUnfiltered.length > 0) {
-      return allNewsUnfiltered
         .sort((a, b) => {
           const dateA = a.publishedAt || new Date(0)
           const dateB = b.publishedAt || new Date(0)
