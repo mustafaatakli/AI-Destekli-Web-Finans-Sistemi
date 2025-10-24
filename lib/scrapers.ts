@@ -729,23 +729,23 @@ export async function getFinancialNews(category: 'doviz' | 'altin' | 'borsa'): P
  */
 async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
   try {
-    // Türk haber sitelerinin RSS feed'leri
+    // Kategori-spesifik RSS feed'leri
+    // Her kategori için FARKLI kaynaklar kullanılıyor
     const rssFeeds: Record<string, string[]> = {
       doviz: [
         'https://www.bloomberght.com/api/categories/haberler/doviz?_format=rss',
-        'https://www.hurriyet.com.tr/rss/ekonomi',
-        'https://www.ntv.com.tr/ekonomi.rss',
+        'https://www.mynet.com/haber/ekonomi/rss/doviz',
+        'https://www.dunya.com/feed/doviz',
       ],
       altin: [
         'https://www.bloomberght.com/api/categories/haberler/emtia?_format=rss',
-        'https://www.hurriyet.com.tr/rss/ekonomi',
-        'https://www.ntv.com.tr/ekonomi.rss',
+        'https://www.mynet.com/haber/ekonomi/rss/altin',
+        'https://www.dunya.com/feed/altin',
       ],
       borsa: [
         'https://www.bloomberght.com/api/categories/haberler/borsa?_format=rss',
-        'https://www.hurriyet.com.tr/rss/ekonomi',
-        'https://www.cnnturk.com/feed/rss/ekonomi/news',
-        'https://www.ntv.com.tr/ekonomi.rss',
+        'https://www.mynet.com/haber/ekonomi/rss/borsa',
+        'https://www.dunya.com/feed/borsa',
       ]
     }
 
