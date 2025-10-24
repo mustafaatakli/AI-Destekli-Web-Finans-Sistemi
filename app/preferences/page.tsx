@@ -472,7 +472,7 @@ export default function PreferencesPage() {
                       />
                       <div>
                         <span className="text-white font-semibold">Günde 2 Bülten</span>
-                        <p className="text-sm text-gray-400">Sabah 08:00 ve akşam seçtiğiniz saatte</p>
+                        <p className="text-sm text-gray-400">Seçtiğiniz saatte ve 12 saat sonra</p>
                       </div>
                     </label>
                     <label className="flex items-center p-4 bg-slate-900/50 rounded-lg border-2 border-slate-600 cursor-pointer hover:border-slate-500 transition-colors">
@@ -486,7 +486,7 @@ export default function PreferencesPage() {
                       />
                       <div>
                         <span className="text-white font-semibold">Günde 3 Bülten</span>
-                        <p className="text-sm text-gray-400">Sabah, öğle ve akşam bildirim alın</p>
+                        <p className="text-sm text-gray-400">Seçtiğiniz saatte, 6 saat sonra ve 12 saat sonra</p>
                       </div>
                     </label>
                   </div>
