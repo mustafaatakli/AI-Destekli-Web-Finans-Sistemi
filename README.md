@@ -490,20 +490,6 @@ Bu proje şu açık kaynak projelerini kullanmaktadır:
 
 ---
 
-## ⭐ Yıldız Verin!
-
-Bu projeyi beğendiyseniz yıldız vermeyi unutmayın! ⭐
-
----
-
-<div align="center">
-
-**Made with in Türkiye**
-
-[Website](https://finalert.vercel.app) • [Telegram Bot](https://t.me/MyFinAlertBot) • [Documentation](https://github.com/KULLANICI_ADI/finalert/wiki)
-
-</div>
-
 ## 🖼️ Örnek Çalışma Görüntüleri
 
 <img src="https://github.com/mustafaatakli/AI-Destekli-Web-Finans-Sistemi/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-10-24%20002607.png" width="auto">
@@ -523,3 +509,19 @@ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın! ⭐
 ---
 
 <img src="https://github.com/mustafaatakli/AI-Destekli-Web-Finans-Sistemi/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202025-10-24%20002823.png" width="auto">
+
+---
+
+## ⭐ Yıldız Verin!
+
+Bu projeyi beğendiyseniz yıldız vermeyi unutmayın! ⭐
+
+---
+
+<div align="center">
+
+**Made with in Türkiye**
+
+[Website](https://finalert.vercel.app) • [Telegram Bot](https://t.me/MyFinAlertBot) • [Documentation](https://github.com/KULLANICI_ADI/finalert/wiki)
+
+</div>
