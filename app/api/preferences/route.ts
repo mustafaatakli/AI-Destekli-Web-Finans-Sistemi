@@ -160,6 +160,10 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
+    // ⏰ Eğer saat veya frekans değiştiyse, lastSentAt'i sıfırla
+    const hourChanged = existingSubscriber.notificationHour !== notificationHour
+    const frequencyChanged = existingSubscriber.notificationFrequency !== notificationFrequency
+
     // Tercihleri güncelle
     const updatedSubscriber = await prisma.subscriber.update({
       where: { email },
@@ -167,7 +171,9 @@ export async function PATCH(request: NextRequest) {
         categories: categoriesArray.join(','),
         notificationHour,
         notificationFrequency,
-        isActive
+        isActive,
+        // Saat veya frekans değiştiyse döngüyü sıfırla
+        ...(hourChanged || frequencyChanged ? { lastSentAt: null } : {})
       }
     })
 
