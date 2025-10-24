@@ -31,24 +31,36 @@ export async function GET(request: NextRequest) {
 
     console.log(`Sending bulletins for hour: ${currentHour}`)
 
-    // Get all active subscribers for this hour
+    // Get all active subscribers (not just for this hour)
     const now = new Date()
-    const subscribers = await prisma.subscriber.findMany({
+    const allSubscribers = await prisma.subscriber.findMany({
       where: {
-        isActive: true,
-        notificationHour: currentHour
+        isActive: true
       }
     })
 
-    if (subscribers.length === 0) {
+    if (allSubscribers.length === 0) {
       return NextResponse.json({
         success: true,
-        message: `No subscribers found for hour ${currentHour}`,
+        message: `No active subscribers found`,
         sent: 0
       })
     }
 
-    console.log(`Found ${subscribers.length} subscribers for hour ${currentHour}`)
+    // Filter subscribers who should receive email at this hour
+    const subscribers = allSubscribers.filter(subscriber => 
+      shouldSendEmailAtHour(subscriber, currentHour, now)
+    )
+
+    if (subscribers.length === 0) {
+      return NextResponse.json({
+        success: true,
+        message: `No subscribers scheduled for hour ${currentHour}`,
+        sent: 0
+      })
+    }
+
+    console.log(`Found ${subscribers.length} subscribers to send at hour ${currentHour}`)
 
     // Get market data from cache
     const marketData = await getMarketData()
@@ -59,12 +71,6 @@ export async function GET(request: NextRequest) {
 
     for (const subscriber of subscribers) {
       try {
-        // Check if user should receive email based on frequency
-        if (!shouldSendEmail(subscriber, now)) {
-          console.log(`⏭ Skipping ${subscriber.email} - frequency not met`)
-          continue
-        }
-
         // Parse categories
         const categories = subscriber.categories.split(',') as ('doviz' | 'altin' | 'borsa')[]
 
@@ -150,6 +156,44 @@ export async function GET(request: NextRequest) {
       },
       { status: 500 }
     )
+  }
+}
+
+/**
+ * Check if subscriber should receive email at this specific hour
+ * based on their notification frequency and last sent time
+ */
+function shouldSendEmailAtHour(subscriber: any, currentHour: number, now: Date): boolean {
+  const { notificationHour, notificationFrequency, lastSentAt } = subscriber
+
+  // If never sent before, only send at their chosen hour
+  if (!lastSentAt) {
+    return currentHour === notificationHour
+  }
+
+  const lastSent = new Date(lastSentAt)
+  const hoursSinceLastSent = (now.getTime() - lastSent.getTime()) / (1000 * 60 * 60)
+
+  switch (notificationFrequency) {
+    case 'daily':
+      // Send once per day at their chosen hour
+      return currentHour === notificationHour && hoursSinceLastSent >= 23
+
+    case 'twice':
+      // Send twice per day: at chosen hour and 12 hours later
+      const isFirstSend = currentHour === notificationHour && hoursSinceLastSent >= 23
+      const isSecondSend = currentHour === (notificationHour + 12) % 24 && hoursSinceLastSent >= 11
+      return isFirstSend || isSecondSend
+
+    case 'three_times':
+      // Send three times per day: at chosen hour, +6h, and +12h
+      const isFirst = currentHour === notificationHour && hoursSinceLastSent >= 23
+      const isSecond = currentHour === (notificationHour + 6) % 24 && hoursSinceLastSent >= 5
+      const isThird = currentHour === (notificationHour + 12) % 24 && hoursSinceLastSent >= 5
+      return isFirst || isSecond || isThird
+
+    default:
+      return currentHour === notificationHour
   }
 }
 
