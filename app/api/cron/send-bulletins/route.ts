@@ -169,9 +169,9 @@ export async function GET(request: NextRequest) {
 function shouldSendEmailAtHour(subscriber: any, currentHour: number, now: Date): boolean {
   const { notificationHour, notificationFrequency, lastSentAt } = subscriber
 
-  // If never sent before, only send at their chosen hour
+  // If never sent before, send immediately (don't wait for specific hour)
   if (!lastSentAt) {
-    return currentHour === notificationHour
+    return true
   }
 
   const lastSent = new Date(lastSentAt)
