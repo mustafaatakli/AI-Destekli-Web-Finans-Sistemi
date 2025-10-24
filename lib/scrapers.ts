@@ -723,17 +723,18 @@ export async function getFinancialNews(category: 'doviz' | 'altin' | 'borsa'): P
  */
 function matchesCategory(text: string, category: string): boolean {
   const categoryKeywords: Record<string, string[]> = {
-    doviz: ['dolar', 'euro', 'sterlin', 'döviz', 'kur', 'parite', 'usd', 'eur', 'gbp', 'tcmb', 'merkez bankası', 'faiz', 'enflasyon', 'politika faizi', 'döviz kuru', 'kur farkı', 'parite', 'kambiyo'],
-    altin: ['altın', 'gram', 'çeyrek', 'ons', 'külçe', 'kuyumcu', 'emtia', 'gold', 'ounce', 'altın fiyat', 'değerli metal', '귀금속'],
-    borsa: ['borsa', 'bist', 'hisse', 'endeks', 'pay', 'viop', 'tahvil', 'bono', 'imkb', 'piyasa', 'hisse senedi', 'yatırımcı', 'şirket', 'halka arz', 'kar', 'zarar', 'ciro']
+    doviz: ['dolar', 'euro', 'sterlin', 'döviz', 'kur', 'parite', 'usd', 'eur', 'gbp', 'tcmb', 'merkez bankası', 'faiz', 'enflasyon', 'politika faizi', 'döviz kuru', 'kur farkı', 'kambiyo'],
+    altin: ['altın', 'gram altın', 'çeyrek altın', 'ons altın', 'külçe', 'kuyumcu', 'gold', 'ounce', 'değerli metal', 'gümüş', 'platin'],
+    borsa: ['borsa', 'bist', 'hisse', 'endeks', 'pay', 'viop', 'tahvil', 'bono', 'imkb', 'piyasa', 'hisse senedi', 'yatırımcı', 'halka arz']
   }
 
-  // SADECE NET ALAKASIZ haberleri filtrele (daha az agresif)
+  // SADECE NET ALAKASIZ haberleri filtrele (güçlendirilmiş)
   const excludeKeywords = [
-    'jaguar land rover', 'otomobil üretimi', 'araç üretimi',
-    'nar ihracatı', 'zeytinyağı tesisi', 'tarhana ürün', 'sucuk hileli',
-    'a101 aktüel', 'koşu bandı', 'puzzle oyuncak', 'kamp çadır',
-    'gıda hileli', 'gıda boyası', 'yemek tarif'
+    'jaguar', 'land rover', 'otomobil', 'araç üretim',
+    'zeytinyağı', 'nar ihracat', 'tarhana', 'sucuk',
+    'a101 aktüel', 'koşu bandı', 'puzzle', 'kamp çadır', 'mikser', 'motosiklet',
+    'gıda hileli', 'gıda boyası', 'yemek tarif', 'seramik ihracat',
+    'yasa dışı bahis', 'siber saldırı', 'türk telekom', 'genel müdür atama'
   ]
 
   const keywords = categoryKeywords[category] || []
@@ -758,15 +759,31 @@ function matchesCategory(text: string, category: string): boolean {
  */
 async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
   try {
-    // GENEL ekonomi RSS feed'leri (keyword filtreleme ile kategoriye ayırıyoruz)
-    // Çünkü kategori-spesifik RSS'ler 404 veriyor
-    const rssFeeds: string[] = [
-      'https://www.bloomberght.com/api/v2/rss/homepage',
-      'https://www.dunya.com/feed',
-      'https://www.hurriyet.com.tr/rss/ekonomi',
-      'https://www.cnnturk.com/feed/rss/ekonomi/news',
-      'https://www.ntv.com.tr/ekonomi.rss',
-    ]
+    // Kategori bazlı RSS feed kaynakları
+    const categoryFeeds: Record<string, string[]> = {
+      doviz: [
+        'https://www.hurriyet.com.tr/rss/ekonomi',
+        'https://www.cnnturk.com/feed/rss/ekonomi/news',
+        'https://www.ntv.com.tr/ekonomi.rss',
+        'https://www.mynet.com/haber/rss/ekonomi'
+      ],
+      altin: [
+        'https://www.hurriyet.com.tr/rss/ekonomi',
+        'https://www.cnnturk.com/feed/rss/ekonomi/news',
+        'https://www.ntv.com.tr/ekonomi.rss',
+        'https://www.mynet.com/haber/rss/ekonomi',
+        'https://www.milliyet.com.tr/rss/rssnew/ekonomi.xml'
+      ],
+      borsa: [
+        'https://www.hurriyet.com.tr/rss/ekonomi',
+        'https://www.cnnturk.com/feed/rss/ekonomi/news',
+        'https://www.ntv.com.tr/ekonomi.rss',
+        'https://www.mynet.com/haber/rss/ekonomi',
+        'https://www.milliyet.com.tr/rss/rssnew/ekonomi.xml'
+      ]
+    }
+
+    const rssFeeds = categoryFeeds[category] || categoryFeeds.doviz
 
     const allNews: NewsItem[] = []
 
@@ -776,12 +793,12 @@ async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
         const feed = await rssParser.parseURL(feedUrl)
 
         if (feed.items && feed.items.length > 0) {
-          // Esnek keyword filtresi - başlık veya içerikte en az bir keyword olmalı
+          // SIKI keyword filtresi - SADECE başlıkta keyword olmalı (içerikte değil)
           const news = feed.items
             .slice(0, 10) // Daha fazla haber al ki filtreleme sonrası yeterli kalsın
             .filter(item => {
-              const text = `${item.title || ''} ${item.contentSnippet || ''}`
-              return matchesCategory(text, category)
+              const title = item.title || ''
+              return matchesCategory(title, category)
             })
             .map(item => ({
               title: item.title || 'Başlık yok',
