@@ -743,6 +743,13 @@ async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
       ]
     }
 
+    // Kategori anahtar kelimeleri
+    const categoryKeywords: Record<string, string[]> = {
+      doviz: ['döviz', 'dolar', 'euro', 'sterlin', 'yuan', 'kur', 'tl', 'usd', 'eur', 'gbp'],
+      altin: ['altın', 'gümüş', 'gram', 'ons', 'emtia', 'külçe', 'çeyrek'],
+      borsa: ['borsa', 'hisse', 'endeks', 'xu100', 'bist', 'pay', 'yatırım', 'tahvil']
+    }
+
     const feedUrls = rssFeeds[category] || rssFeeds.borsa
     const allNews: NewsItem[] = []
 
@@ -752,13 +759,23 @@ async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
         const feed = await rssParser.parseURL(feedUrl)
 
         if (feed.items && feed.items.length > 0) {
-          const news = feed.items.slice(0, 5).map(item => ({
-            title: item.title || 'Başlık yok',
-            url: item.link || '',
-            content: item.contentSnippet || item.content || item.title || '',
-            category: category,
-            publishedAt: item.pubDate ? new Date(item.pubDate) : new Date()
-          }))
+          const news = feed.items
+            .filter(item => {
+              // Kategori filtresi: başlık veya içerik anahtar kelime içermeli
+              const title = (item.title || '').toLowerCase()
+              const content = (item.contentSnippet || item.content || '').toLowerCase()
+              const keywords = categoryKeywords[category] || []
+              
+              return keywords.some(keyword => title.includes(keyword) || content.includes(keyword))
+            })
+            .slice(0, 5)
+            .map(item => ({
+              title: item.title || 'Başlık yok',
+              url: item.link || '',
+              content: item.contentSnippet || item.content || item.title || '',
+              category: category,
+              publishedAt: item.pubDate ? new Date(item.pubDate) : new Date()
+            }))
 
           allNews.push(...news)
         }
@@ -783,41 +800,6 @@ async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
     return []
   } catch (error) {
     console.error('RSS news fetching failed:', error)
-    return []
-  }
-}
-
-async function getNewsFromBloomberg(category: string): Promise<NewsItem[]> {
-  try {
-    const categoryUrls: Record<string, string> = {
-      doviz: 'https://www.bloomberght.com/doviz',
-      altin: 'https://www.bloomberght.com/emtia',
-      borsa: 'https://www.bloomberght.com/borsa'
-    }
-
-    const response = await rateLimitedRequest(categoryUrls[category] || categoryUrls.borsa)
-
-    const $ = cheerio.load(response.data)
-    const news: NewsItem[] = []
-
-    $('.news-item, article').slice(0, 5).each((_, elem) => {
-      const title = $(elem).find('h2, h3, .title').text().trim()
-      const url = $(elem).find('a').attr('href') || ''
-      const content = $(elem).find('p, .summary').text().trim()
-
-      if (title && url) {
-        news.push({
-          title,
-          url: url.startsWith('http') ? url : `https://www.bloomberght.com${url}`,
-          content,
-          category,
-          publishedAt: new Date()
-        })
-      }
-    })
-
-    return news
-  } catch (error) {
     return []
   }
 }
