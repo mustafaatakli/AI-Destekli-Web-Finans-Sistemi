@@ -718,49 +718,59 @@ export async function getFinancialNews(category: 'doviz' | 'altin' | 'borsa'): P
 }
 
 /**
+ * Kategori için keyword kontrolü yapar (ESNEK)
+ * Başlık veya içerikte en az bir keyword varsa true döner
+ */
+function matchesCategory(text: string, category: string): boolean {
+  const categoryKeywords: Record<string, string[]> = {
+    doviz: ['dolar', 'euro', 'sterlin', 'döviz', 'kur', 'parite', 'usd', 'eur', 'gbp', 'tcmb', 'merkez bankası', 'faiz'],
+    altin: ['altın', 'gram altın', 'çeyrek', 'ons', 'külçe', 'gram', 'kuyumcu', 'emtia', 'gold'],
+    borsa: ['borsa', 'bist', 'hisse', 'endeks', 'pay', 'viop', 'tahvil', 'bono', 'imkb', 'piyasa']
+  }
+
+  const keywords = categoryKeywords[category] || []
+  const lowerText = text.toLowerCase()
+
+  // En az bir keyword içermeli
+  return keywords.some(keyword => lowerText.includes(keyword.toLowerCase()))
+}
+
+/**
  * RSS Feed kaynaklarından haber çekme (EN GÜVENİLİR YÖNTEM)
  * RSS feed'ler HTML parsing'e göre çok daha stabil ve güvenilirdir
- * 
- * NOT: Keyword filtreleme kaldırıldı çünkü:
- * - RSS feed'lerindeki haberler genellikle genel ekonomi haberleri
- * - Keyword filtresi çok katı olduğu için hiç haber bulamıyordu
- * - AI (Gemini) zaten kategori-spesifik özetler üretebiliyor
- * - Bu yöntem daha esnek ve güvenilir
+ *
+ * NOT: Esnek keyword filtreleme eklendi:
+ * - Her kategoriye özel keyword listesi
+ * - En az bir keyword eşleşmesi yeterli
+ * - Alakasız haberleri filtreler
  */
 async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
   try {
-    // Kategori-spesifik RSS feed'leri
-    // Her kategori için FARKLI kaynaklar kullanılıyor
-    const rssFeeds: Record<string, string[]> = {
-      doviz: [
-        'https://www.bloomberght.com/api/categories/haberler/doviz?_format=rss',
-        'https://www.mynet.com/haber/ekonomi/rss/doviz',
-        'https://www.dunya.com/feed/doviz',
-      ],
-      altin: [
-        'https://www.bloomberght.com/api/categories/haberler/emtia?_format=rss',
-        'https://www.mynet.com/haber/ekonomi/rss/altin',
-        'https://www.dunya.com/feed/altin',
-      ],
-      borsa: [
-        'https://www.bloomberght.com/api/categories/haberler/borsa?_format=rss',
-        'https://www.mynet.com/haber/ekonomi/rss/borsa',
-        'https://www.dunya.com/feed/borsa',
-      ]
-    }
+    // GENEL ekonomi RSS feed'leri (keyword filtreleme ile kategoriye ayırıyoruz)
+    // Çünkü kategori-spesifik RSS'ler 404 veriyor
+    const rssFeeds: string[] = [
+      'https://www.bloomberght.com/api/v2/rss/homepage',
+      'https://www.dunya.com/feed',
+      'https://www.hurriyet.com.tr/rss/ekonomi',
+      'https://www.cnnturk.com/feed/rss/ekonomi/news',
+      'https://www.ntv.com.tr/ekonomi.rss',
+    ]
 
-    const feedUrls = rssFeeds[category] || rssFeeds.borsa
     const allNews: NewsItem[] = []
 
-    // Her RSS feed'den haber çek (filtresiz - AI'ya güveniyoruz)
-    for (const feedUrl of feedUrls) {
+    // Her RSS feed'den haber çek
+    for (const feedUrl of rssFeeds) {
       try {
         const feed = await rssParser.parseURL(feedUrl)
 
         if (feed.items && feed.items.length > 0) {
-          // Keyword filtresi KALDIRILDI - doğrudan map ediyoruz
+          // Esnek keyword filtresi - başlık veya içerikte en az bir keyword olmalı
           const news = feed.items
-            .slice(0, 5)
+            .slice(0, 10) // Daha fazla haber al ki filtreleme sonrası yeterli kalsın
+            .filter(item => {
+              const text = `${item.title || ''} ${item.contentSnippet || ''}`
+              return matchesCategory(text, category)
+            })
             .map(item => ({
               title: item.title || 'Başlık yok',
               url: item.link || '',
