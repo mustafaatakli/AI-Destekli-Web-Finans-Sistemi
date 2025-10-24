@@ -70,7 +70,6 @@
 - **SMTP:** Nodemailer (Gmail App Password)
 - **Telegram:** Telegram Bot API
 - **CRON:** Node-Cron (Development) / External Services (Production)
-- 
 ---
 
 ## 📦 Kurulum
@@ -313,18 +312,6 @@ npm run cron
 Bu komut `lib/cron.ts` dosyasını çalıştırır ve şu işleri yapar:
 - **Her 6 saatte:** Piyasa verilerini günceller
 - **08:00, 14:00, 20:00:** Bültenleri gönderir
-
-### Production (Vercel)
-
-**Seçenek 1: Vercel Cron (Pro Plan - $20/ay)**
-
-`vercel.json` dosyası zaten hazır, otomatik çalışır.
-
-**Seçenek 2: Cron-Job.org (ÜCRETSİZ - Önerilen)**
-
-1. https://cron-job.org → Ücretsiz kayıt
-2. Şu URL'leri zamanlayın:
-
 ```
 # Veri Güncelleme (Her 6 saatte)
 URL: https://your-app.vercel.app/api/cron/update-data
