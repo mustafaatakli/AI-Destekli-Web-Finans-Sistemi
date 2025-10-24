@@ -209,7 +209,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Sanitize categories
-    const categoriesArray = Array.isArray(categories) ? categories : [categories]
+    // If categories is a comma-separated string, split it first
+    let categoriesArray: string[]
+    if (Array.isArray(categories)) {
+      categoriesArray = categories
+    } else if (typeof categories === 'string') {
+      categoriesArray = categories.split(',').map(c => c.trim())
+    } else {
+      categoriesArray = []
+    }
     const sanitizedCategories = sanitizeCategories(categoriesArray)
     
     if (sanitizedCategories.length === 0) {
