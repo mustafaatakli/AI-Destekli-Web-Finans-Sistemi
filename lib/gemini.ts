@@ -16,14 +16,21 @@ export async function summarizeNews(newsItems: Array<{ title: string; url: strin
       .map((item, index) => `${index + 1}. ${item.title}`)
       .join('\n')
 
+    const categoryContext: Record<string, string> = {
+      doviz: 'döviz kurları, para birimleri, TCMB, faiz oranları ve enflasyon',
+      altin: 'altın fiyatları, gram altın, çeyrek altın ve değerli metaller',
+      borsa: 'Borsa İstanbul (BIST), hisse senetleri, endeksler ve şirket haberleri'
+    }
+
     const prompt = `Sen bir finans editörüsün. Aşağıdaki ${categoryNames[category] || category} haberlerini Türkçe olarak kısa ve öz bir şekilde özetle.
 
 KURALLAR:
-- Maksimum 4-5 KISA cümle yaz
-- Sadece EN ÖNEMLİ gelişmeleri belirt
-- Sayıları ve yüzdeleri kullan
+- Maksimum 3-4 KISA cümle yaz
+- Sadece ${categoryContext[category] || category} ile DOĞRUDAN ilgili haberleri özetle
+- Jaguar, otomobil, zeytinyağı, gıda gibi ALAKASIZ haberleri ATLA
+- Sayıları ve yüzdeleri kullan (örn: "yüzde 0.3 arttı")
 - Profesyonel ve anlaşılır dil kullan
-- Gereksiz detaylara girme
+- Eğer HİÇBİR haber ${categoryNames[category]} ile alakalı değilse: "Bu kategoride güncel haber bulunmamaktadır." yaz
 
 Haberler:
 ${newsText}
