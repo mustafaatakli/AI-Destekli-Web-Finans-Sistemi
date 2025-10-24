@@ -804,6 +804,41 @@ async function getNewsFromRSS(category: string): Promise<NewsItem[]> {
   }
 }
 
+async function getNewsFromBloomberg(category: string): Promise<NewsItem[]> {
+  try {
+    const categoryUrls: Record<string, string> = {
+      doviz: 'https://www.bloomberght.com/doviz',
+      altin: 'https://www.bloomberght.com/emtia',
+      borsa: 'https://www.bloomberght.com/borsa'
+    }
+
+    const response = await rateLimitedRequest(categoryUrls[category] || categoryUrls.borsa)
+
+    const $ = cheerio.load(response.data)
+    const news: NewsItem[] = []
+
+    $('.news-item, article').slice(0, 5).each((_, elem) => {
+      const title = $(elem).find('h2, h3, .title').text().trim()
+      const url = $(elem).find('a').attr('href') || ''
+      const content = $(elem).find('p, .summary').text().trim()
+
+      if (title && url) {
+        news.push({
+          title,
+          url: url.startsWith('http') ? url : `https://www.bloomberght.com${url}`,
+          content,
+          category,
+          publishedAt: new Date()
+        })
+      }
+    })
+
+    return news
+  } catch (error) {
+    return []
+  }
+}
+
 async function getNewsFromEkonomi(category: string): Promise<NewsItem[]> {
   try {
     const response = await rateLimitedRequest('https://www.ekonomim.com/finans')
