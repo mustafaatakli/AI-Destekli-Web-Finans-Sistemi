@@ -80,22 +80,19 @@ export async function updateMarketDataCache(): Promise<CachedMarketData> {
     prisma.marketData.create({
       data: {
         dataType: 'currency',
-        data: JSON.stringify(currencyData),
-        source: currencyData._kaynak || 'unknown'
+        data: JSON.stringify(currencyData)
       }
     }),
     prisma.marketData.create({
       data: {
         dataType: 'gold',
-        data: JSON.stringify(goldData),
-        source: goldData._kaynak || 'unknown'
+        data: JSON.stringify(goldData)
       }
     }),
     prisma.marketData.create({
       data: {
         dataType: 'stock',
-        data: JSON.stringify(stockData),
-        source: stockData._kaynak || 'unknown'
+        data: JSON.stringify(stockData)
       }
     })
   ])
@@ -141,9 +138,10 @@ export async function cleanupOldCache(): Promise<void> {
 
 /**
  * Get cached news or fetch fresh if not available
+ * Cache süresi: 2 saat (daha sık güncelleme için)
  */
 export async function getCachedNews(category: 'doviz' | 'altin' | 'borsa'): Promise<NewsItem[]> {
-  const cacheExpiry = new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 hours
+  const cacheExpiry = new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 saat
 
   // Try to get from cache
   const cachedNews = await prisma.newsCache.findMany({
@@ -170,7 +168,7 @@ export async function getCachedNews(category: 'doviz' | 'altin' | 'borsa'): Prom
   console.log(`Fetching fresh news for category: ${category}`)
   const freshNews = await getFinancialNews(category)
 
-  // Cache the news (but don't save summaries yet - that's done by AI service)
+  // Cache the news
   if (freshNews.length > 0) {
     await Promise.all(
       freshNews.map(item =>
@@ -198,19 +196,4 @@ export async function updateNewsSummary(newsUrl: string, summary: string): Promi
     data: { summary }
   })
   console.log(`Updated summary for news: ${newsUrl}`)
-}
-
-/**
- * Clean up old news cache (keep only last 7 days)
- */
-export async function cleanupOldNews(): Promise<void> {
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-
-  const result = await prisma.newsCache.deleteMany({
-    where: {
-      createdAt: { lt: sevenDaysAgo }
-    }
-  })
-
-  console.log(`Cleaned up ${result.count} old news items`)
 }
