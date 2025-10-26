@@ -96,6 +96,21 @@ interface StockData {
 }
 
 // Currency scraper with fallback sources
+/**
+ * Validate currency data - check if USD has valid price
+ */
+function isValidCurrencyData(data: CurrencyData | null): boolean {
+  if (!data || Object.keys(data).length <= 1) return false
+
+  // Check if USD has valid selling price (most important currency)
+  const usd = data['USD']
+  if (usd && typeof usd === 'object' && 'satis' in usd) {
+    const satis = usd.satis
+    return typeof satis === 'number' && !isNaN(satis) && satis > 0
+  }
+  return false
+}
+
 export async function getCurrencyData(): Promise<CurrencyData | null> {
   const sources = [
     getCurrencyFromTCMB,
@@ -111,17 +126,19 @@ export async function getCurrencyData(): Promise<CurrencyData | null> {
   for (const source of sources) {
     try {
       const data = await source()
-      if (data && Object.keys(data).length > 1) {
-        console.log(`Currency data fetched from: ${data._kaynak}`)
+      if (isValidCurrencyData(data)) {
+        console.log(`✅ Currency data fetched from: ${data!._kaynak}`)
         return data
+      } else {
+        console.warn(`⚠️ Invalid currency data from source, trying next...`)
       }
     } catch (error) {
-      console.error(`Currency source failed:`, error)
+      console.error(`❌ Currency source failed:`, error)
       continue
     }
   }
 
-  console.error('All currency sources failed')
+  console.error('❌ All currency sources failed')
   return null
 }
 
@@ -341,6 +358,24 @@ async function getCurrencyFromMilliyet(): Promise<CurrencyData | null> {
 }
 
 // Gold scraper with fallback sources
+/**
+ * Validate gold data - check if at least one gold type has valid price
+ */
+function isValidGoldData(data: GoldData | null): boolean {
+  if (!data || Object.keys(data).length <= 1) return false
+
+  // Check if at least one gold type has valid satis (selling price)
+  const goldTypes = ['gram', 'ceyrek', 'yarim', 'tam']
+  return goldTypes.some(type => {
+    const goldItem = data[type as keyof GoldData]
+    if (goldItem && typeof goldItem === 'object' && 'satis' in goldItem) {
+      const satis = goldItem.satis
+      return typeof satis === 'number' && !isNaN(satis) && satis > 0
+    }
+    return false
+  })
+}
+
 export async function getGoldData(): Promise<GoldData | null> {
   const sources = [
     getGoldFromMynet,
@@ -354,17 +389,20 @@ export async function getGoldData(): Promise<GoldData | null> {
   for (const source of sources) {
     try {
       const data = await source()
-      if (data && Object.keys(data).length > 1) {
-        console.log(`Gold data fetched from: ${data._kaynak}`)
+      // Validate data has at least one valid price
+      if (isValidGoldData(data)) {
+        console.log(`✅ Gold data fetched from: ${data!._kaynak}`)
         return data
+      } else {
+        console.warn(`⚠️ Invalid gold data from source, trying next...`)
       }
     } catch (error) {
-      console.error(`Gold source failed:`, error)
+      console.error(`❌ Gold source failed:`, error)
       continue
     }
   }
 
-  console.error('All gold sources failed')
+  console.error('❌ All gold sources failed')
   return null
 }
 
@@ -375,24 +413,48 @@ async function getGoldFromMynet(): Promise<GoldData | null> {
     const $ = cheerio.load(response.data)
     const gold: GoldData = { _kaynak: 'Mynet' }
 
-    $('.table-data tbody tr').each((_, row) => {
-      const name = $(row).find('td').eq(0).text().trim().toLowerCase()
-      const alis = parseFloat($(row).find('td').eq(1).text().replace(',', '.'))
-      const satis = parseFloat($(row).find('td').eq(2).text().replace(',', '.'))
+    // Try multiple selectors for Mynet
+    const selectors = [
+      '.table-data tbody tr',
+      'table tbody tr',
+      '.gold-table tr',
+      '.data-table tr'
+    ]
 
-      if (name.includes('gram')) {
-        gold['gram'] = { alis, satis, degisim: 0 }
-      } else if (name.includes('çeyrek')) {
-        gold['ceyrek'] = { alis, satis, degisim: 0 }
-      } else if (name.includes('yarım')) {
-        gold['yarim'] = { alis, satis, degisim: 0 }
-      } else if (name.includes('tam')) {
-        gold['tam'] = { alis, satis, degisim: 0 }
+    for (const selector of selectors) {
+      const rows = $(selector)
+      if (rows.length > 0) {
+        rows.each((_, row) => {
+          const name = $(row).find('td').eq(0).text().trim().toLowerCase()
+          const alisText = $(row).find('td').eq(1).text().replace(/[^\d,.-]/g, '').replace(',', '.')
+          const satisText = $(row).find('td').eq(2).text().replace(/[^\d,.-]/g, '').replace(',', '.')
+
+          const alis = parseFloat(alisText)
+          const satis = parseFloat(satisText)
+
+          // Only add if values are valid numbers
+          if (name && !isNaN(satis)) {
+            if (name.includes('gram')) {
+              gold['gram'] = { alis: isNaN(alis) ? 0 : alis, satis, degisim: 0 }
+            } else if (name.includes('çeyrek')) {
+              gold['ceyrek'] = { alis: isNaN(alis) ? 0 : alis, satis, degisim: 0 }
+            } else if (name.includes('yarım')) {
+              gold['yarim'] = { alis: isNaN(alis) ? 0 : alis, satis, degisim: 0 }
+            } else if (name.includes('tam')) {
+              gold['tam'] = { alis: isNaN(alis) ? 0 : alis, satis, degisim: 0 }
+            }
+          }
+        })
+
+        // If we found data, break
+        if (Object.keys(gold).length > 1) break
       }
-    })
+    }
 
-    return gold
+    // Return data only if we have at least one gold type
+    return Object.keys(gold).length > 1 ? gold : null
   } catch (error) {
+    console.error('Mynet gold scraper error:', error)
     return null
   }
 }
@@ -543,6 +605,24 @@ async function getGoldFromCanlıAltin(): Promise<GoldData | null> {
 }
 
 // Stock data scraper
+/**
+ * Validate stock data - check if at least one stock has valid price
+ */
+function isValidStockData(data: StockData | null): boolean {
+  if (!data || Object.keys(data).length <= 1) return false
+
+  // Check if at least one stock has valid price
+  const stockSymbols = Object.keys(data).filter(key => key !== '_kaynak')
+  return stockSymbols.some(symbol => {
+    const stock = data[symbol]
+    if (stock && typeof stock === 'object' && 'fiyat' in stock) {
+      const fiyat = stock.fiyat
+      return typeof fiyat === 'number' && !isNaN(fiyat) && fiyat > 0
+    }
+    return false
+  })
+}
+
 export async function getStockData(): Promise<StockData | null> {
   const sources = [
     getStockFromInvesting,
@@ -555,17 +635,19 @@ export async function getStockData(): Promise<StockData | null> {
   for (const source of sources) {
     try {
       const data = await source()
-      if (data && Object.keys(data).length > 1) {
-        console.log(`Stock data fetched from: ${data._kaynak}`)
+      if (isValidStockData(data)) {
+        console.log(`✅ Stock data fetched from: ${data!._kaynak}`)
         return data
+      } else {
+        console.warn(`⚠️ Invalid stock data from source, trying next...`)
       }
     } catch (error) {
-      console.error(`Stock source failed:`, error)
+      console.error(`❌ Stock source failed:`, error)
       continue
     }
   }
 
-  console.error('All stock sources failed')
+  console.error('❌ All stock sources failed')
   return null
 }
 
