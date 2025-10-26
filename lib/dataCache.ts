@@ -80,19 +80,22 @@ export async function updateMarketDataCache(): Promise<CachedMarketData> {
     prisma.marketData.create({
       data: {
         dataType: 'currency',
-        data: JSON.stringify(currencyData)
+        data: JSON.stringify(currencyData),
+        source: currencyData._kaynak || 'Unknown'
       }
     }),
     prisma.marketData.create({
       data: {
         dataType: 'gold',
-        data: JSON.stringify(goldData)
+        data: JSON.stringify(goldData),
+        source: goldData._kaynak || 'Unknown'
       }
     }),
     prisma.marketData.create({
       data: {
         dataType: 'stock',
-        data: JSON.stringify(stockData)
+        data: JSON.stringify(stockData),
+        source: stockData._kaynak || 'Unknown'
       }
     })
   ])
