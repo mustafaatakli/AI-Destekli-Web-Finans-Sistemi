@@ -30,12 +30,16 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const hourParam = searchParams.get('hour')
-    const currentHour = hourParam ? parseInt(hourParam) : new Date().getHours()
 
-    console.log(`Sending bulletins for hour: ${currentHour}`)
+    // Get current time in Istanbul timezone (UTC+3)
+    const now = new Date()
+    const istanbulTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }))
+    const currentHour = hourParam ? parseInt(hourParam) : istanbulTime.getHours()
+
+    console.log(`⏰ Sending bulletins for hour: ${currentHour} (Istanbul Time)`)
+    console.log(`📅 Current date/time: ${istanbulTime.toLocaleString('tr-TR')}`)
 
     // Get all active subscribers (not just for this hour)
-    const now = new Date()
     const allSubscribers = await prisma.subscriber.findMany({
       where: {
         isActive: true
