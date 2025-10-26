@@ -1,5 +1,5 @@
 import cron from 'node-cron'
-import { updateMarketDataCache, cleanupOldCache, cleanupOldNews } from './dataCache'
+import { updateMarketDataCache, cleanupOldCache } from './dataCache'
 
 /**
  * Initialize all cron jobs for the application
@@ -24,7 +24,6 @@ export function initializeCronJobs() {
     console.log('Running scheduled cache cleanup...')
     try {
       await cleanupOldCache()
-      await cleanupOldNews()
       console.log('✓ Cache cleanup completed successfully')
     } catch (error) {
       console.error('✗ Failed to cleanup cache:', error)
