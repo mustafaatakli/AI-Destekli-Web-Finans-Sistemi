@@ -42,7 +42,7 @@
 
 ## 🚀 Canlı Demo
 
-🌐 **Web Sitesi:** [https://finalert.app](https://finalertweb.app)   
+🌐 **Web Sitesi:** [https://finalertweb.app](https://finalertweb.app)   
 🤖 **Telegram Bot:** [@MyFinAlertBot](https://t.me/MyFinAlertBot)  
 
 ---
