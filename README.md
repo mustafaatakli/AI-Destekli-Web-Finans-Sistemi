@@ -299,41 +299,6 @@ GET /api/cron/send-bulletins?hour=8
 Authorization: Bearer YOUR_CRON_SECRET
 ```
 
----
-
-## ⏰ CRON Jobs (Zamanlanmış İşler)
-
-### Development (Local)
-
-```bash
-npm run cron
-```
-
-Bu komut `lib/cron.ts` dosyasını çalıştırır ve şu işleri yapar:
-- **Her 6 saatte:** Piyasa verilerini günceller
-- **08:00, 14:00, 20:00:** Bültenleri gönderir
-```
-# Veri Güncelleme (Her 6 saatte)
-URL: https://your-app.vercel.app/api/cron/update-data
-Schedule: 0 */6 * * *
-Header: Authorization: Bearer YOUR_CRON_SECRET
-
-# Sabah Bülteni
-URL: https://your-app.vercel.app/api/cron/send-bulletins?hour=8
-Schedule: 0 8 * * *
-Header: Authorization: Bearer YOUR_CRON_SECRET
-
-# Öğle Bülteni
-URL: https://your-app.vercel.app/api/cron/send-bulletins?hour=14
-Schedule: 0 14 * * *
-Header: Authorization: Bearer YOUR_CRON_SECRET
-
-# Akşam Bülteni
-URL: https://your-app.vercel.app/api/cron/send-bulletins?hour=20
-Schedule: 0 20 * * *
-Header: Authorization: Bearer YOUR_CRON_SECRET
-```
-
 ## 📚 Proje Yapısı
 
 ```
