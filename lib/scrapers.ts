@@ -378,8 +378,8 @@ function isValidGoldData(data: GoldData | null): boolean {
 
 export async function getGoldData(): Promise<GoldData | null> {
   const sources = [
-    getGoldFromMynet,
-    getGoldFromBigpara,
+    getGoldFromBigpara,    // Priority 1: Bigpara (JSON data - most reliable)
+    getGoldFromMynet,      // Priority 2: Mynet (fallback)
     getGoldFromGenelpara,
     getGoldFromDovizCom,
     getGoldFromAltinFiyatlari,
@@ -413,48 +413,31 @@ async function getGoldFromMynet(): Promise<GoldData | null> {
     const $ = cheerio.load(response.data)
     const gold: GoldData = { _kaynak: 'Mynet' }
 
-    // Try multiple selectors for Mynet
-    const selectors = [
-      '.table-data tbody tr',
-      'table tbody tr',
-      '.gold-table tr',
-      '.data-table tr'
-    ]
+    // Mynet uses option tags with data-alis and data-satis attributes
+    $('option[data-alis][data-satis]').each((_, option) => {
+      const name = $(option).text().trim().toLowerCase()
+      const alis = parseFloat($(option).attr('data-alis') || '')
+      const satis = parseFloat($(option).attr('data-satis') || '')
 
-    for (const selector of selectors) {
-      const rows = $(selector)
-      if (rows.length > 0) {
-        rows.each((_, row) => {
-          const name = $(row).find('td').eq(0).text().trim().toLowerCase()
-          const alisText = $(row).find('td').eq(1).text().replace(/[^\d,.-]/g, '').replace(',', '.')
-          const satisText = $(row).find('td').eq(2).text().replace(/[^\d,.-]/g, '').replace(',', '.')
-
-          const alis = parseFloat(alisText)
-          const satis = parseFloat(satisText)
-
-          // Only add if values are valid numbers
-          if (name && !isNaN(satis)) {
-            if (name.includes('gram')) {
-              gold['gram'] = { alis: isNaN(alis) ? 0 : alis, satis, degisim: 0 }
-            } else if (name.includes('çeyrek')) {
-              gold['ceyrek'] = { alis: isNaN(alis) ? 0 : alis, satis, degisim: 0 }
-            } else if (name.includes('yarım')) {
-              gold['yarim'] = { alis: isNaN(alis) ? 0 : alis, satis, degisim: 0 }
-            } else if (name.includes('tam')) {
-              gold['tam'] = { alis: isNaN(alis) ? 0 : alis, satis, degisim: 0 }
-            }
-          }
-        })
-
-        // If we found data, break
-        if (Object.keys(gold).length > 1) break
+      // Only add if values are valid numbers
+      if (!isNaN(alis) && !isNaN(satis)) {
+        // Prioritize non-"Kapalı Çarşı" versions
+        if (name.includes('gram altın') && !name.includes('kapalı') && !name.includes('bilezik')) {
+          gold['gram'] = { alis, satis, degisim: 0 }
+        } else if (name.includes('çeyrek altın') && !name.includes('kapalı')) {
+          gold['ceyrek'] = { alis, satis, degisim: 0 }
+        } else if (name.includes('yarım altın') && !name.includes('kapalı')) {
+          gold['yarim'] = { alis, satis, degisim: 0 }
+        } else if (name.includes('tam altın') && !name.includes('kapalı')) {
+          gold['tam'] = { alis, satis, degisim: 0 }
+        }
       }
-    }
+    })
 
     // Return data only if we have at least one gold type
     return Object.keys(gold).length > 1 ? gold : null
   } catch (error) {
-    console.error('Mynet gold scraper error:', error)
+    console.error('❌ Mynet gold scraper error:', error)
     return null
   }
 }
@@ -462,28 +445,41 @@ async function getGoldFromMynet(): Promise<GoldData | null> {
 async function getGoldFromBigpara(): Promise<GoldData | null> {
   try {
     const response = await rateLimitedRequest('https://bigpara.hurriyet.com.tr/altin/')
+    const html = response.data
 
-    const $ = cheerio.load(response.data)
+    // Bigpara uses JavaScript data array - extract it
+    const match = html.match(/var \$altinData = (\[.*?\]);/)
+    if (!match) {
+      console.warn('⚠️ Bigpara: Could not find $altinData array')
+      return null
+    }
+
+    const altinData = JSON.parse(match[1])
     const gold: GoldData = { _kaynak: 'Bigpara' }
 
-    $('table tr').each((_, row) => {
-      const name = $(row).find('td').eq(0).text().trim().toLowerCase()
-      const alis = parseFloat($(row).find('td').eq(1).text().replace(',', '.'))
-      const satis = parseFloat($(row).find('td').eq(2).text().replace(',', '.'))
+    // Map data from JSON
+    for (const item of altinData) {
+      const name = item.aciklama?.toLowerCase() || ''
+      const alis = parseFloat(item.alis)
+      const satis = parseFloat(item.satis)
 
-      if (name.includes('gram')) {
-        gold['gram'] = { alis, satis, degisim: 0 }
-      } else if (name.includes('çeyrek')) {
-        gold['ceyrek'] = { alis, satis, degisim: 0 }
-      } else if (name.includes('yarım')) {
-        gold['yarim'] = { alis, satis, degisim: 0 }
-      } else if (name.includes('tam')) {
-        gold['tam'] = { alis, satis, degisim: 0 }
+      // Only add if values are valid numbers
+      if (!isNaN(alis) && !isNaN(satis)) {
+        if (name.includes('gram') && item.sembolkisa === 'GLDGR') {
+          gold['gram'] = { alis, satis, degisim: item.yuzdedegisim || 0 }
+        } else if (name.includes('çeyrek') && item.sembolkisa === 'SGLDC') {
+          gold['ceyrek'] = { alis, satis, degisim: item.yuzdedegisim || 0 }
+        } else if (name.includes('yarım') && item.sembolkisa === 'SGLDY') {
+          gold['yarim'] = { alis, satis, degisim: item.yuzdedegisim || 0 }
+        } else if (name.includes('cumhuriyet') && item.sembolkisa === 'SCUM') {
+          gold['tam'] = { alis, satis, degisim: item.yuzdedegisim || 0 }
+        }
       }
-    })
+    }
 
-    return gold
+    return Object.keys(gold).length > 1 ? gold : null
   } catch (error) {
+    console.error('❌ Bigpara gold scraper error:', error)
     return null
   }
 }
