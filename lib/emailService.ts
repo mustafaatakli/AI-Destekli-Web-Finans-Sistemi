@@ -76,8 +76,8 @@ export function generateNewsEmailTemplate(
                   .map(([currency, data]: [string, any]) => `
                     <tr>
                       <td style="padding: 8px 0; font-weight: 600;">${currency}</td>
-                      <td style="padding: 8px 0;">Alış: ${data.alis?.toFixed(2)} TL</td>
-                      <td style="padding: 8px 0;">Satış: ${data.satis?.toFixed(2)} TL</td>
+                      <td style="padding: 8px 0;">Alış: ${typeof data.alis === 'number' && !isNaN(data.alis) ? data.alis.toFixed(2) + ' TL' : '-'}</td>
+                      <td style="padding: 8px 0;">Satış: ${typeof data.satis === 'number' && !isNaN(data.satis) ? data.satis.toFixed(2) + ' TL' : '-'}</td>
                     </tr>
                   `).join('')}
               </table>
@@ -93,8 +93,8 @@ export function generateNewsEmailTemplate(
                   .map(([type, data]: [string, any]) => `
                     <tr>
                       <td style="padding: 8px 0; font-weight: 600; text-transform: capitalize;">${type}</td>
-                      <td style="padding: 8px 0;">Alış: ${data.alis && !isNaN(data.alis) ? data.alis.toFixed(2) + ' TL' : '-'}</td>
-                      <td style="padding: 8px 0;">Satış: ${data.satis && !isNaN(data.satis) ? data.satis.toFixed(2) + ' TL' : '-'}</td>
+                      <td style="padding: 8px 0;">Alış: ${typeof data.alis === 'number' && !isNaN(data.alis) ? data.alis.toFixed(2) + ' TL' : '-'}</td>
+                      <td style="padding: 8px 0;">Satış: ${typeof data.satis === 'number' && !isNaN(data.satis) ? data.satis.toFixed(2) + ' TL' : '-'}</td>
                     </tr>
                   `).join('')}
               </table>
@@ -111,7 +111,7 @@ export function generateNewsEmailTemplate(
                   .map(([symbol, data]: [string, any]) => `
                     <tr>
                       <td style="padding: 8px 0; font-weight: 600;">${symbol}</td>
-                      <td style="padding: 8px 0;">Fiyat: ${data.fiyat?.toFixed(2)} TL</td>
+                      <td style="padding: 8px 0;">Fiyat: ${typeof data.fiyat === 'number' && !isNaN(data.fiyat) ? data.fiyat.toFixed(2) + ' TL' : '-'}</td>
                       <td style="padding: 8px 0; color: ${(data.degisim || 0) >= 0 ? '#28a745' : '#dc3545'};">
                         ${(data.degisim || 0) >= 0 ? '▲' : '▼'} %${Math.abs(data.degisim || 0).toFixed(2)}
                       </td>
