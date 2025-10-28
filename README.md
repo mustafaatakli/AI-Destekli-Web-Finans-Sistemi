@@ -464,6 +464,10 @@ Bu proje şu açık kaynak projelerini kullanmaktadır:
 
 ---
 
+<img src="https://github.com/mustafaatakli/AI-Destekli-Web-Finans-Sistemi/blob/main/images/mail.google.com_mail_u_3_.png" width="auto">
+
+--- 
+
 ## ⭐ Yıldız Verin!
 
 Bu projeyi beğendiyseniz yıldız vermeyi unutmayın! ⭐
