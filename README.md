@@ -1,6 +1,6 @@
 # 📈 FinAlert - Yapay Zeka Destekli Finans Takip Sistemi
 
-**[🇹🇷 Türkçe](#-finalert---yapay-zeka-destekli-finans-takip-sistemi)** | **[🇬🇧 English](#-finalert---ai-powered-finance-tracking-system)**
+**[🇹🇷 Türkçe](#-finalert---yapay-zeka-destekli-finans-takip-sistemi)** | **[ENG English](#-finalert---ai-powered-finance-tracking-system)**
 
 ---
 
